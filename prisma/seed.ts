@@ -6,31 +6,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding database...");
 
-  // Create default SuperAdmin
-  const superAdminEmail = "superadmin@example.com";
-  const superAdminPassword = "superadmin123";
-
-  const existingSuperAdmin = await prisma.user.findUnique({
-    where: { email: superAdminEmail },
-  });
-
-  if (existingSuperAdmin) {
-    console.log("SuperAdmin already exists");
-  } else {
-    const hashPassword = await bcrypt.hash(superAdminPassword, 10);
-
-    const superAdmin = await prisma.user.create({
-      data: {
-        email: superAdminEmail,
-        password: hashPassword,
-        role: Role.SUPERADMIN,
-        name: "SuperAdmin",
-      },
-    });
-
-    console.log("SuperAdmin created", superAdmin);
-  }
-
   // Create default Admin
   const adminEmail = "admin@example.com";
   const adminPassword = "admin123";
@@ -50,11 +25,6 @@ async function main() {
         password: hashPassword,
         role: Role.ADMIN,
         name: "Admin",
-        subscription: {
-          create: {
-            isActive: true,
-          },
-        },
       },
     });
 
