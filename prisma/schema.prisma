@@ -42,3 +42,24 @@ model Subscription {
 
   @@map("subscription")
 }
+
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  sku         String?  @unique
+  category    String?
+
+  costPrice   Float    
+  sellPrice   Float    
+
+  quantity    Int      @default(0)   
+  lowStockAt  Int?     
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+ @@map("products")
+}
