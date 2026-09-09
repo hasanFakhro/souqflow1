@@ -7,7 +7,19 @@ export function EditProductSection({ product }: { product: ProductFormData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleUpdateProduct = async (updatedProduct: ProductFormData) => {
-    // API call will connect here
+    const response = await fetch(`/api/products/${product.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedProduct),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update product");
+  }
+
+  console.log("Product updated successfully");
     console.log("Updating product:", updatedProduct);
   };
 

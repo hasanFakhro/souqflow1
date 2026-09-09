@@ -6,7 +6,7 @@ export type ProductFormData = {
   id?: string;
   name: string;
   description: string;
-  price: number | "";
+  sellPrice: number | "";
   category: string;
   imageUrl: string;
 };
@@ -29,7 +29,7 @@ export default function ProductFormModal({
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     description: "",
-    price: "",
+    sellPrice: "",
     category: "",
     imageUrl: "",
   });
@@ -44,7 +44,7 @@ export default function ProductFormModal({
       setFormData({
         name: "",
         description: "",
-        price: "",
+        sellPrice: "",
         category: "",
         imageUrl: "",
       });
@@ -116,11 +116,11 @@ export default function ProductFormModal({
                 step="0.01"
                 min="0"
                 required
-                value={formData.price}
+                value={formData.sellPrice}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    price: e.target.value === "" ? "" : Number(e.target.value),
+                    sellPrice: e.target.value === "" ? "" : Number(e.target.value),
                   })
                 }
                 placeholder="29.99"
@@ -147,7 +147,7 @@ export default function ProductFormModal({
               Image URL
             </label>
             <input
-              type="url"
+              type=""
               value={formData.imageUrl}
               onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
               placeholder="https://images.unsplash.com/..."
