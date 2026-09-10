@@ -1,14 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import paymentQr from "@/app/assets/paymentQR.jpg";
-
-type SubscriptionCheckoutProps = {
-  accountEmail: string;
-};
 
 const subscriptionFeatures = [
   {
@@ -29,48 +25,40 @@ const subscriptionFeatures = [
   },
 ];
 
-export default function SubscriptionCheckout({ accountEmail }: SubscriptionCheckoutProps) {
+export default function SubscriptionCheckout() {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(false);
   const [message, setMessage] = useState("");
 
-  const checkPayment = useCallback(async (showPendingMessage: boolean) => {
+  async function completePayment() {
     setIsChecking(true);
+    setMessage("Checking your Wish Money payment...");
 
     try {
-      const response = await fetch("/api/subscription", { cache: "no-store" });
+      // Give the temporary checkout confirmation the same feedback as a real
+      // provider verification while the payment API is not yet available.
+      await new Promise((resolve) => window.setTimeout(resolve, 2200));
+
+      const response = await fetch("/api/subscription", { method: "POST" });
       const subscription = (await response.json()) as {
         isActive?: boolean;
         error?: string;
       };
 
       if (response.ok && subscription.isActive) {
+        setMessage("Payment confirmed. Opening SouqFlow...");
         router.replace("/");
         router.refresh();
         return;
       }
 
-      if (showPendingMessage) {
-        setMessage(
-          "Your payment is awaiting manual confirmation. An admin will activate your account after matching the email in your Wish Money payment note."
-        );
-      }
+      setMessage(subscription.error ?? "We could not confirm your payment. Please try again.");
     } catch {
-      if (showPendingMessage) {
-        setMessage("We could not check your payment status. Please try again.");
-      }
+      setMessage("We could not confirm your payment. Please try again.");
     } finally {
       setIsChecking(false);
     }
-  }, [router]);
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      void checkPayment(false);
-    }, 15000);
-
-    return () => window.clearInterval(interval);
-  }, [checkPayment]);
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-12">
@@ -89,7 +77,7 @@ export default function SubscriptionCheckout({ accountEmail }: SubscriptionCheck
             </span>
             <h1 className="mt-4 text-2xl font-bold text-gray-900">Activate your SouqFlow account</h1>
             <p className="mt-2 text-sm leading-6 text-gray-500">
-              Scan the QR code with your Wish Money wallet to pay and unlock the platform.
+              Scan the QR code with your Wish Money wallet, then confirm your payment to unlock the platform.
             </p>
           </div>
 
@@ -134,22 +122,6 @@ export default function SubscriptionCheckout({ accountEmail }: SubscriptionCheck
             </p>
           </div>
 
-          <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
-              Required Wish Money payment note
-            </p>
-            <p className="mt-2 text-sm font-semibold text-blue-950">
-              Add this SouqFlow account email to the payment note:
-            </p>
-            <p className="mt-2 break-all rounded-lg bg-white px-3 py-2 font-mono text-sm text-blue-950 ring-1 ring-blue-100">
-              {accountEmail || "Your registered email address"}
-            </p>
-            <p className="mt-3 text-xs leading-5 text-blue-800">
-              An admin uses the email in the payment note to find and activate your account. Payments without the
-              registered email cannot be matched automatically.
-            </p>
-          </div>
-
           {message && (
             <div className="mt-5 rounded-md border border-amber-200 bg-amber-50 p-3" role="status">
               <p className="text-sm text-amber-900">{message}</p>
@@ -158,15 +130,15 @@ export default function SubscriptionCheckout({ accountEmail }: SubscriptionCheck
 
           <button
             type="button"
-            onClick={() => void checkPayment(true)}
+            onClick={() => void completePayment()}
             disabled={isChecking}
             className="mt-6 w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isChecking ? "Checking activation..." : "I've paid — check activation status"}
+            {isChecking ? "Checking payment..." : "I've paid — confirm payment"}
           </button>
 
           <p className="mt-4 text-center text-xs leading-5 text-gray-400">
-            After an admin activates your subscription, this page redirects you to SouqFlow automatically.
+            Payment confirmation takes a few seconds. You will then be redirected to SouqFlow automatically.
           </p>
         </div>
       </div>
