@@ -67,8 +67,7 @@ export async function POST(request: Request) {
         name: input.name,
         email: input.email,
         password,
-        // New accounts can sign in immediately; billing can update this record later.
-        subscription: { create: { isActive: true } },
+        subscription: { create: { isActive: false } },
       },
       select: { id: true, name: true, email: true },
     });
