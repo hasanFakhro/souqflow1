@@ -5,7 +5,7 @@ import SubscriptionCheckout from "./SubscriptionCheckout";
 
 export default async function SubscriptionPage() {
   const session = await auth();
-  const user = session?.user as { id?: string; email?: string | null; role?: string } | undefined;
+  const user = session?.user as { id?: string; role?: string } | undefined;
 
   if (!user?.id) {
     redirect("/signin");
@@ -21,5 +21,5 @@ export default async function SubscriptionPage() {
     redirect("/");
   }
 
-  return <SubscriptionCheckout accountEmail={user.email ?? ""} />;
+  return <SubscriptionCheckout />;
 }

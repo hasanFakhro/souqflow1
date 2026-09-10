@@ -13,7 +13,6 @@ export type SubscriptionState = {
 };
 
 export type SubscriptionActivation = {
-  email: string;
   expiresAt: Date;
 };
 
@@ -62,18 +61,13 @@ export function addOneMonth(date: Date) {
   return nextMonth;
 }
 
-/**
- * Grants one subscription month after an administrator confirms a Wish Money
- * payment. The email must be the one the payer added to the wallet note.
- */
-export async function activateSubscriptionForEmail(
-  email: string
+export async function activateSubscriptionForUser(
+  userId: string
 ): Promise<SubscriptionActivation | null> {
   return prisma.$transaction(async (transaction) => {
     const user = await transaction.user.findUnique({
-      where: { email },
+      where: { id: userId },
       select: {
-        email: true,
         id: true,
         role: true,
         subscription: {
@@ -82,7 +76,7 @@ export async function activateSubscriptionForEmail(
       },
     });
 
-    // Only paid USER accounts can be activated through the manual workflow.
+    // This prevents an account from activating a different user's subscription.
     if (!user || user.role !== "USER") {
       return null;
     }
@@ -111,6 +105,6 @@ export async function activateSubscriptionForEmail(
       },
     });
 
-    return { email: user.email, expiresAt };
+    return { expiresAt };
   });
 }
