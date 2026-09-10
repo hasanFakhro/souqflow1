@@ -44,7 +44,6 @@ model Subscription {
   @@map("subscription")
 }
 
-
 model Product {
   id          String   @id @default(cuid())
   name        String
