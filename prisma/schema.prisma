@@ -3,10 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+  // uncomment next line if you use Prisma <5.10
 }
-
 enum Role {
   USER
   ADMIN
@@ -42,7 +43,6 @@ model Subscription {
 
   @@map("subscription")
 }
-
 
 model Product {
   id          String   @id @default(cuid())

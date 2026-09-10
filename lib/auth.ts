@@ -25,9 +25,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: {
             email: credentials.email as string,
           },
-          include: {
-            subscription: true,
-          },
         });
 
         if (!user || !user.password) {
@@ -41,13 +38,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!isMatch) {
           throw new Error("Invalid credentials");
-        }
-
-        // Admin does not need a subscription
-        if (user.role !== "SUPERADMIN") {
-          if (!user.subscription || !user.subscription.isActive) {
-            throw new Error("No active subscription");
-          }
         }
 
         return {
